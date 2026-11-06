@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONM C Programs</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #222;
+    margin: 0;
+    line-height: 1.6;
+}
+header {
+    background: #ffffff;
+    padding: 25px 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+h1 { margin: 0; font-size: 30px; }
+header p { margin: 6px 0 0; color: #666; }
+main {
+    max-width: 900px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+.program {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 12px;
+}
+.program h2 { font-size: 18px; margin: 0 0 8px; }
+button {
+    background: #333;
+    color: white;
+    border: 0;
+    border-radius: 4px;
+    padding: 8px 13px;
+    cursor: pointer;
+    font-size: 14px;
+}
+button:hover { background: #555; }
+pre {
+    display: none;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    margin: 12px 0 0;
+    overflow-x: auto;
+    white-space: pre;
+    font: 13px/1.5 Consolas, monospace;
+}
+pre.visible { display: block; }
+footer {
+    text-align: center;
+    color: #777;
+    padding: 20px;
+    font-size: 13px;
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>CONM C Programs</h1>
+    <p>Computer Oriented Numerical Methods — Practical Programs</p>
+</header>
+<main id="programList"></main>
+<footer>CONM C Programs</footer>
+<script>
+const programs = [{"filename": "01_bisection.c", "title": "01 Bisection", "code": "/* Program 1: Bisection method */\n#include <stdio.h>\n#include <math.h>\ndouble f(double x){ return x*x*x - x - 4; } /* Change equation here */\nint main(void){\n double a,b,e,c; int i=0;\n printf(\"Enter lower and upper limits: \"); if(scanf(\"%lf%lf\",&a,&b)!=2) return 1;\n printf(\"Enter tolerance: \"); if(scanf(\"%lf\",&e)!=1 || e<=0) return 1;\n if(f(a)*f(b)>0){ puts(\"Invalid interval: f(a) and f(b) must have opposite signs.\"); return 1; }\n do { c=(a+b)/2.0; ++i; printf(\"Iteration %d: x = %.10f\\n\",i,c);\n   if(f(a)*f(c)<0) b=c; else a=c;\n } while(fabs(b-a)>e && i<10000);\n printf(\"Approximate root = %.10f\\n\",c); return 0;\n}\n"}, {"filename": "02_false_position.c", "title": "02 False Position", "code": "/* Program 2: False-position (Regula Falsi) method */\n#include <stdio.h>\n#include <math.h>\ndouble f(double x){ return x*x*x - x - 4; } /* Change equation here */\nint main(void){\n double a,b,e,c,old; int i=0;\n printf(\"Enter lower and upper limits: \"); if(scanf(\"%lf%lf\",&a,&b)!=2) return 1;\n printf(\"Enter tolerance: \"); if(scanf(\"%lf\",&e)!=1 || e<=0) return 1;\n if(f(a)*f(b)>0){ puts(\"Invalid interval: f(a) and f(b) must have opposite signs.\"); return 1; }\n do { old=(a+b)/2.0; c=(a*f(b)-b*f(a))/(f(b)-f(a)); ++i;\n   printf(\"Iteration %d: x = %.10f\\n\",i,c);\n   if(f(a)*f(c)<0) b=c; else a=c;\n } while(fabs(c-old)>e && fabs(f(c))>e && i<10000);\n printf(\"Approximate root = %.10f\\n\",c); return 0;\n}\n"}, {"filename": "03_newton_raphson.c", "title": "03 Newton Raphson", "code": "/* Program 3: Newton-Raphson method */\n#include <stdio.h>\n#include <math.h>\ndouble f(double x){ return x*x*x - x - 4; }\ndouble df(double x){ return 3*x*x - 1; }\nint main(void){ double x,e,d; int n,i;\n printf(\"Enter initial guess, tolerance and maximum iterations: \");\n if(scanf(\"%lf%lf%d\",&x,&e,&n)!=3 || e<=0 || n<=0) return 1;\n for(i=1;i<=n;i++){ d=df(x); if(fabs(d)<1e-14){ puts(\"Derivative is too small.\"); return 1; }\n   double next=x-f(x)/d; printf(\"Iteration %d: x = %.10f\\n\",i,next);\n   if(fabs(next-x)<e){ printf(\"Root = %.10f\\n\",next); return 0; } x=next;\n }\n puts(\"Solution did not converge within the given iterations.\"); return 0;\n}\n"}, {"filename": "04_birge_vieta.c", "title": "04 Birge Vieta", "code": "/* Program 4: Birge-Vieta method for a polynomial.\n   Enter coefficients from highest power to constant term. */\n#include <stdio.h>\n#include <math.h>\nint main(void){ int n,i,k,maxit; double a[51],b[51],c[51],x,e;\n printf(\"Degree of polynomial (1-50): \"); if(scanf(\"%d\",&n)!=1 || n<1 || n>50) return 1;\n printf(\"Enter %d coefficients (highest power first): \",n+1);\n for(i=0;i<=n;i++) if(scanf(\"%lf\",&a[i])!=1) return 1;\n printf(\"Initial guess, tolerance, maximum iterations: \"); if(scanf(\"%lf%lf%d\",&x,&e,&maxit)!=3 || e<=0 || maxit<1) return 1;\n for(k=1;k<=maxit;k++){ b[0]=a[0]; for(i=1;i<=n;i++) b[i]=a[i]+x*b[i-1];\n   c[0]=b[0]; for(i=1;i<n;i++) c[i]=b[i]+x*c[i-1];\n   if(fabs(c[n-1])<1e-14){ puts(\"Derivative is too small.\"); return 1; }\n   double nx=x-b[n]/c[n-1]; printf(\"Iteration %d: x = %.10f\\n\",k,nx);\n   if(fabs(nx-x)<e){ printf(\"Approximate root = %.10f\\n\",nx); return 0; } x=nx;\n }\n puts(\"Root not found within the given iterations.\"); return 0;\n}\n"}, {"filename": "05_gauss_elimination.c", "title": "05 Gauss Elimination", "code": "/* Program 5: Gaussian elimination */\n#include <stdio.h>\n#define MAX 20\nint main(void){ int n,i,j,k; double a[MAX][MAX+1],x[MAX];\n printf(\"Number of unknowns (1-%d): \",MAX); if(scanf(\"%d\",&n)!=1 || n<1 || n>MAX) return 1;\n for(i=0;i<n;i++){ printf(\"Enter %d coefficients followed by RHS for equation %d: \",n,i+1); for(j=0;j<=n;j++) if(scanf(\"%lf\",&a[i][j])!=1)return 1; }\n for(k=0;k<n;k++){ int p=k; for(i=k+1;i<n;i++) if(a[i][k]>a[p][k] || a[i][k]<-a[p][k]) p=i;\n   if(a[p][k]>-1e-12 && a[p][k]<1e-12){ puts(\"No unique solution (zero pivot).\"); return 1; }\n   for(j=k;j<=n;j++){ double t=a[k][j];a[k][j]=a[p][j];a[p][j]=t; }\n   for(i=k+1;i<n;i++){ double m=a[i][k]/a[k][k]; for(j=k;j<=n;j++) a[i][j]-=m*a[k][j]; }\n }\n for(i=n-1;i>=0;i--){ x[i]=a[i][n]; for(j=i+1;j<n;j++)x[i]-=a[i][j]*x[j]; x[i]/=a[i][i]; }\n for(i=0;i<n;i++)printf(\"x%d = %.6f\\n\",i+1,x[i]); return 0;\n}\n"}, {"filename": "06_gauss_jordan.c", "title": "06 Gauss Jordan", "code": "/* Program 6: Gauss-Jordan method */\n#include <stdio.h>\n#define MAX 20\nint main(void){ int n,i,j,k; double a[MAX][MAX+1];\n printf(\"Number of unknowns (1-%d): \",MAX); if(scanf(\"%d\",&n)!=1 || n<1 || n>MAX)return 1;\n for(i=0;i<n;i++){ printf(\"Enter coefficients and RHS for equation %d: \",i+1); for(j=0;j<=n;j++)if(scanf(\"%lf\",&a[i][j])!=1)return 1; }\n for(k=0;k<n;k++){ int p=k; for(i=k+1;i<n;i++)if(a[i][k]>a[p][k] || a[i][k]<-a[p][k])p=i;\n   if(a[p][k]>-1e-12 && a[p][k]<1e-12){puts(\"No unique solution (zero pivot).\");return 1;}\n   for(j=0;j<=n;j++){double t=a[k][j];a[k][j]=a[p][j];a[p][j]=t;}\n   double pivot=a[k][k]; for(j=0;j<=n;j++)a[k][j]/=pivot;\n   for(i=0;i<n;i++)if(i!=k){double m=a[i][k];for(j=0;j<=n;j++)a[i][j]-=m*a[k][j];}\n }\n for(i=0;i<n;i++)printf(\"x%d = %.6f\\n\",i+1,a[i][n]); return 0;\n}\n"}, {"filename": "07_gauss_seidel.c", "title": "07 Gauss Seidel", "code": "/* Program 7: Gauss-Seidel iterative method */\n#include <stdio.h>\n#include <math.h>\n#define MAX 20\nint main(void){int n,i,j,it,maxit;double a[MAX][MAX+1],x[MAX]={0},old[MAX],eps;\n printf(\"Number of unknowns (1-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<1||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter coefficients and RHS for equation %d: \",i+1);for(j=0;j<=n;j++)if(scanf(\"%lf\",&a[i][j])!=1)return 1;}\n printf(\"Tolerance and maximum iterations: \");if(scanf(\"%lf%d\",&eps,&maxit)!=2||eps<=0||maxit<1)return 1;\n for(i=0;i<n;i++)if(fabs(a[i][i])<1e-14){puts(\"A diagonal coefficient is zero.\");return 1;}\n for(it=1;it<=maxit;it++){for(i=0;i<n;i++)old[i]=x[i];\n  for(i=0;i<n;i++){double s=a[i][n];for(j=0;j<n;j++)if(j!=i)s-=a[i][j]*x[j];x[i]=s/a[i][i];}\n  double err=0;for(i=0;i<n;i++)if(fabs(x[i]-old[i])>err)err=fabs(x[i]-old[i]);\n  printf(\"Iteration %d:\",it);for(i=0;i<n;i++)printf(\" x%d=%.8f\",i+1,x[i]);puts(\"\");if(err<eps)return 0;\n }\n puts(\"Maximum iterations reached.\");return 0;\n}\n"}, {"filename": "08_newton_forward_difference.c", "title": "08 Newton Forward Difference", "code": "/* Program 8: Newton forward-difference table (equally spaced x values) */\n#include <stdio.h>\n#define MAX 20\nint main(void){int n,i,j;double x[MAX],d[MAX][MAX];\n printf(\"Number of data points (2-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<2||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter x[%d] and y[%d]: \",i,i);if(scanf(\"%lf%lf\",&x[i],&d[i][0])!=2)return 1;}\n for(i=1;i<n;i++)if(x[i]-x[i-1] <= 0){puts(\"x values must be increasing.\");return 1;}\n for(j=1;j<n;j++)for(i=0;i<n-j;i++)d[i][j]=d[i+1][j-1]-d[i][j-1];\n puts(\"Forward difference table:\");for(i=0;i<n;i++){printf(\"%10.4f\",x[i]);for(j=0;j<n-i;j++)printf(\"%12.4f\",d[i][j]);puts(\"\");}return 0;\n}\n"}, {"filename": "09_newton_backward_difference.c", "title": "09 Newton Backward Difference", "code": "/* Program 9: Newton backward-difference table (equally spaced x values) */\n#include <stdio.h>\n#define MAX 20\nint main(void){int n,i,j;double x[MAX],d[MAX][MAX];\n printf(\"Number of data points (2-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<2||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter x[%d] and y[%d]: \",i,i);if(scanf(\"%lf%lf\",&x[i],&d[i][0])!=2)return 1;}\n for(i=1;i<n;i++)if(x[i]-x[i-1] <= 0){puts(\"x values must be increasing.\");return 1;}\n for(j=1;j<n;j++)for(i=n-1;i>=j;i--)d[i][j]=d[i][j-1]-d[i-1][j-1];\n puts(\"Backward difference table:\");for(i=0;i<n;i++){printf(\"%10.4f\",x[i]);for(j=0;j<=i;j++)printf(\"%12.4f\",d[i][j]);puts(\"\");}return 0;\n}\n"}, {"filename": "10_newton_divided_difference_table.c", "title": "10 Newton Divided Difference Table", "code": "/* Program 10: Newton divided-difference table */\n#include <stdio.h>\n#include <math.h>\n#define MAX 20\nint main(void){int n,i,j;double x[MAX],d[MAX][MAX];\n printf(\"Number of data points (2-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<2||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter x[%d] and y[%d]: \",i,i);if(scanf(\"%lf%lf\",&x[i],&d[i][0])!=2)return 1;}\n for(j=1;j<n;j++)for(i=0;i<n-j;i++){double den=x[i+j]-x[i];if(fabs(den)<1e-14){puts(\"Repeated x value.\");return 1;}d[i][j]=(d[i+1][j-1]-d[i][j-1])/den;}\n puts(\"Divided-difference table:\");for(i=0;i<n;i++){printf(\"%10.4f\",x[i]);for(j=0;j<n-i;j++)printf(\"%12.6f\",d[i][j]);puts(\"\");}return 0;\n}\n"}, {"filename": "11_newton_divided_interpolation.c", "title": "11 Newton Divided Interpolation", "code": "/* Program 11: Newton divided-difference interpolation polynomial */\n#include <stdio.h>\n#define MAX 20\nint main(void){int n,i,j;double x[MAX],d[MAX][MAX],v,p;\n printf(\"Number of data points (2-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<2||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter x[%d] and y[%d]: \",i,i);if(scanf(\"%lf%lf\",&x[i],&d[i][0])!=2)return 1;}\n for(j=1;j<n;j++)for(i=0;i<n-j;i++){double den=x[i+j]-x[i];if(den==0){puts(\"Repeated x value.\");return 1;}d[i][j]=(d[i+1][j-1]-d[i][j-1])/den;}\n printf(\"Enter x at which y is required: \");if(scanf(\"%lf\",&v)!=1)return 1;\n p=d[0][0];for(j=1;j<n;j++){double term=d[0][j];for(i=0;i<j;i++)term*=v-x[i];p+=term;}\n printf(\"Interpolated value = %.6f\\n\",p);return 0;\n}\n"}, {"filename": "12_lagrange_interpolation.c", "title": "12 Lagrange Interpolation", "code": "/* Program 12: Lagrange interpolation polynomial */\n#include <stdio.h>\n#define MAX 20\nint main(void){int n,i,j;double x[MAX],y[MAX],v,sum=0,term;\n printf(\"Number of data points (2-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<2||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter x[%d] and y[%d]: \",i,i);if(scanf(\"%lf%lf\",&x[i],&y[i])!=2)return 1;}\n printf(\"Enter x at which y is required: \");if(scanf(\"%lf\",&v)!=1)return 1;\n for(i=0;i<n;i++){term=y[i];for(j=0;j<n;j++)if(i!=j){if(x[i]==x[j]){puts(\"x values must be distinct.\");return 1;}term*=(v-x[j])/(x[i]-x[j]);}sum+=term;}\n printf(\"Interpolated value = %.6f\\n\",sum);return 0;\n}\n"}, {"filename": "13_inverse_lagrange_interpolation.c", "title": "13 Inverse Lagrange Interpolation", "code": "/* Program 13: Inverse Lagrange interpolation (estimate x for a given y) */\n#include <stdio.h>\n#define MAX 20\nint main(void){int n,i,j;double x[MAX],y[MAX],v,sum=0,term;\n printf(\"Number of data points (2-%d): \",MAX);if(scanf(\"%d\",&n)!=1||n<2||n>MAX)return 1;\n for(i=0;i<n;i++){printf(\"Enter x[%d] and y[%d]: \",i,i);if(scanf(\"%lf%lf\",&x[i],&y[i])!=2)return 1;}\n printf(\"Enter y for which x is required: \");if(scanf(\"%lf\",&v)!=1)return 1;\n for(i=0;i<n;i++){term=x[i];for(j=0;j<n;j++)if(i!=j){if(y[i]==y[j]){puts(\"y values must be distinct.\");return 1;}term*=(v-y[j])/(y[i]-y[j]);}sum+=term;}\n printf(\"Estimated value of x = %.6f\\n\",sum);return 0;\n}\n"}, {"filename": "14_trapezoidal_rule.c", "title": "14 Trapezoidal Rule", "code": "/* Program 14: Trapezoidal rule for integral of 1/(1+x^2) */\n#include <stdio.h>\n#include <math.h>\ndouble f(double x){return 1.0/(1.0+x*x);}\nint main(void){double a,b,h,s;int n,i;printf(\"Enter lower and upper limits: \");if(scanf(\"%lf%lf\",&a,&b)!=2)return 1;\n printf(\"Enter number of sub-intervals: \");if(scanf(\"%d\",&n)!=1||n<1)return 1;h=(b-a)/n;s=f(a)+f(b);\n for(i=1;i<n;i++)s+=2*f(a+i*h);printf(\"Integral = %.6f\\n\",h*s/2);return 0;}\n"}, {"filename": "15_simpsons_one_third_rule.c", "title": "15 Simpsons One Third Rule", "code": "/* Program 15: Simpson's 1/3 rule for integral of 1/(1+x^2) */\n#include <stdio.h>\ndouble f(double x){return 1.0/(1.0+x*x);}\nint main(void){double a,b,h,s;int n,i;printf(\"Enter lower and upper limits: \");if(scanf(\"%lf%lf\",&a,&b)!=2)return 1;\n printf(\"Enter an even number of sub-intervals: \");if(scanf(\"%d\",&n)!=1||n<2||n%2)return 1;h=(b-a)/n;s=f(a)+f(b);\n for(i=1;i<n;i++)s+=(i%2?4:2)*f(a+i*h);printf(\"Integral = %.6f\\n\",s*h/3);return 0;}\n"}, {"filename": "16_simpsons_three_eighth_rule.c", "title": "16 Simpsons Three Eighth Rule", "code": "/* Program 16: Simpson's 3/8 rule for integral of 1/(1+x^2) */\n#include <stdio.h>\ndouble f(double x){return 1.0/(1.0+x*x);}\nint main(void){double a,b,h,s;int n,i;printf(\"Enter lower and upper limits: \");if(scanf(\"%lf%lf\",&a,&b)!=2)return 1;\n printf(\"Enter number of sub-intervals (multiple of 3): \");if(scanf(\"%d\",&n)!=1||n<3||n%3)return 1;h=(b-a)/n;s=f(a)+f(b);\n for(i=1;i<n;i++)s+=(i%3==0?2:3)*f(a+i*h);printf(\"Integral = %.6f\\n\",3*h*s/8);return 0;}\n"}, {"filename": "17_eulers_method.c", "title": "17 Eulers Method", "code": "/* Program 17: Euler's method for dy/dx = x*y */\n#include <stdio.h>\ndouble f(double x,double y){return x*y;} /* Change differential equation here */\nint main(void){double x,y,xn,h;int n,i;printf(\"Enter initial x and y: \");if(scanf(\"%lf%lf\",&x,&y)!=2)return 1;\n printf(\"Enter calculation point xn and number of steps: \");if(scanf(\"%lf%d\",&xn,&n)!=2||n<1)return 1;h=(xn-x)/n;\n printf(\"x\\t\\ty\\n\");printf(\"%.4f\\t%.6f\\n\",x,y);for(i=0;i<n;i++){y+=h*f(x,y);x+=h;printf(\"%.4f\\t%.6f\\n\",x,y);}printf(\"Value at x=%.4f is %.6f\\n\",xn,y);return 0;}\n"}, {"filename": "18_modified_eulers_method.c", "title": "18 Modified Eulers Method", "code": "/* Program 18: Modified Euler's method for dy/dx = x*x + y */\n#include <stdio.h>\n#include <math.h>\ndouble f(double x,double y){return x*x+y;} /* Change differential equation here */\nint main(void){double x,y,xn,h,pred,corr,old;int n,i,k;printf(\"Enter initial x and y: \");if(scanf(\"%lf%lf\",&x,&y)!=2)return 1;\n printf(\"Enter calculation point xn and number of steps: \");if(scanf(\"%lf%d\",&xn,&n)!=2||n<1)return 1;h=(xn-x)/n;\n for(i=0;i<n;i++){pred=y+h*f(x,y);corr=y+h*(f(x,y)+f(x+h,pred))/2;\n  for(k=0;k<1000;k++){old=corr;corr=y+h*(f(x,y)+f(x+h,corr))/2;if(fabs(corr-old)<1e-8)break;}\n  x+=h;y=corr;printf(\"x=%.4f y=%.6f\\n\",x,y);\n }printf(\"Value at x=%.4f is %.6f\\n\",xn,y);return 0;}\n"}, {"filename": "19_runge_kutta_second_order.c", "title": "19 Runge Kutta Second Order", "code": "/* Program 19: Runge-Kutta second-order method for dy/dx = x*y */\n#include <stdio.h>\ndouble f(double x,double y){return x*y;} /* Change differential equation here */\nint main(void){double x,y,xn,h,k1,k2,k;int n,i;printf(\"Enter initial x and y: \");if(scanf(\"%lf%lf\",&x,&y)!=2)return 1;\n printf(\"Enter calculation point xn and number of steps: \");if(scanf(\"%lf%d\",&xn,&n)!=2||n<1)return 1;h=(xn-x)/n;\n for(i=0;i<n;i++){k1=h*f(x,y);k2=h*f(x+h,y+k1);k=(k1+k2)/2;y+=k;x+=h;printf(\"x=%.4f y=%.6f\\n\",x,y);}\n printf(\"Value at x=%.4f is %.6f\\n\",xn,y);return 0;}\n"}, {"filename": "20_runge_kutta_fourth_order.c", "title": "20 Runge Kutta Fourth Order", "code": "/* Program 20: Runge-Kutta fourth-order method\n   Differential equation from the supplied pages: dy/dx=(y*y-x*x)/(y*y+x*x). */\n#include <stdio.h>\ndouble f(double x,double y){double den=y*y+x*x;return den==0?0:(y*y-x*x)/den;}\nint main(void){double x,y,xn,h,k1,k2,k3,k4,k;int n,i;printf(\"Enter initial x and y: \");if(scanf(\"%lf%lf\",&x,&y)!=2)return 1;\n printf(\"Enter calculation point xn and number of steps: \");if(scanf(\"%lf%d\",&xn,&n)!=2||n<1)return 1;h=(xn-x)/n;\n for(i=0;i<n;i++){k1=h*f(x,y);k2=h*f(x+h/2,y+k1/2);k3=h*f(x+h/2,y+k2/2);k4=h*f(x+h,y+k3);k=(k1+2*k2+2*k3+k4)/6;y+=k;x+=h;printf(\"x=%.4f y=%.6f\\n\",x,y);}\n printf(\"Value at x=%.4f is %.6f\\n\",xn,y);return 0;}\n"}];
+const list = document.getElementById("programList");
+
+programs.forEach((program) => {
+    const section = document.createElement("section");
+    section.className = "program";
+
+    const heading = document.createElement("h2");
+    heading.textContent = program.title;
+
+    const button = document.createElement("button");
+    button.textContent = "View Code";
+
+    const code = document.createElement("pre");
+    code.textContent = program.code;
+
+    button.addEventListener("click", () => {
+        code.classList.toggle("visible");
+        button.textContent = code.classList.contains("visible") ? "Hide Code" : "View Code";
+    });
+
+    section.appendChild(heading);
+    section.appendChild(button);
+    section.appendChild(code);
+    list.appendChild(section);
+});
+</script>
+</body>
+</html>
